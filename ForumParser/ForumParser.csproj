@@ -14,4 +14,10 @@
     <ProjectReference Include="..\ForumStatisticsLib\ForumStatisticsLib.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="terminal.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

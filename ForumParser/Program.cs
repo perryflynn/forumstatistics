@@ -15,11 +15,13 @@ namespace ForumParser
     {
         static void Main(string[] args)
         {
-            if (args.Length == 3 && args[0].StartsWith("http") && args[1].EndsWith(".json") && args[2].EndsWith(".html"))
+            if (!(args.Length > 2 && args[0].StartsWith("http") && args[1].EndsWith(".json") && args[2].EndsWith(".html")))
             {
                 CoEx.WriteLine("Usage: ForumParser.exe http(s)://... output.json output.html");
                 return;
             }
+
+            CoEx.ForcedBufferWidth = 135;
 
             /*
             var url = @"https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/";
@@ -27,14 +29,17 @@ namespace ForumParser
             var htmloutfile = @"H:\laengstes.html";
             */
 
+            var forcecrawl = args.Length > 3 && args[3] == "--force";
             var url = args[0];
             var path = args[1];
             var htmloutfile = args[2];
 
-            Crawl(url, path);
-            
+            if (File.Exists(path) == false || forcecrawl)
+            {
+                Crawl(url, path);
+            }
+
             PrintStats(path, htmloutfile);
-            Console.ReadKey();
         }
 
         private static void Crawl(string url, string path)
@@ -52,10 +57,8 @@ namespace ForumParser
 
         private static void PrintStats(string path, string htmloutfile)
         {
-            CoEx.BufferWidth = CoEx.WindowWidth = 135;
-
             using (var thread = Load(path))
-            using (var writer = new CoExHtmlWriter() { Title = "Das Längste" }) 
+            using (var writer = new CoExHtmlWriter(File.ReadAllText("template.html")) { Title = "Das Längste" }) 
             {
                 CoEx.WriteTitleLarge($"Statistics for {thread.StartpageUrl}");
                 CoEx.WriteLine();

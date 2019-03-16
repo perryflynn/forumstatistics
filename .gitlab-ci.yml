@@ -12,6 +12,12 @@ stages:
   tags: 
     - docker
 
+.tpl:run:
+  extends: .tpl:default
+  only:
+    - schedules
+    - web
+
 #
 # -> Jobs
 #
@@ -24,7 +30,7 @@ test:parser:
     - 'dotnet test'
 
 build:parser:
-  extends: .tpl:default
+  extends: .tpl:run
   stage: build
   script:
     - 'mkdir dist'
@@ -35,7 +41,7 @@ build:parser:
       - 'dist'
 
 parse:netcup:
-  extends: .tpl:default
+  extends: .tpl:run
   stage: parse
   script:
     - 'COMPlus_DebugWriteToStdErr=1 ./dist/ForumParser https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/ laengstes.json laengstes.html'

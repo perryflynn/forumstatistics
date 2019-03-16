@@ -23,7 +23,7 @@ stages:
 #
 
 test:parser:
-  extends: .tpl:default
+  extends: .tpl:run
   stage: test
   script:
     - 'cd ParserTest'

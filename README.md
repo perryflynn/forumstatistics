@@ -8,4 +8,4 @@ There is no need to run this program on your own.
 
 Just checkout the latest build:
 
-https://git.brickburg.de/serverless.industries/forumstatistics/-/jobs/378/artifacts/raw/laengstes.html
+https://hüpf.net/laengstes

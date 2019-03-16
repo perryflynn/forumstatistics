@@ -1,0 +1,46 @@
+stages:
+  - test
+  - build
+  - parse
+
+#
+# -> Template
+#
+
+.tpl:default:
+  image: reg.git.brickburg.de/bbcontainers/dotnetcore:nightly-sdk
+  tags: 
+    - docker
+
+#
+# -> Jobs
+#
+
+test:parser:
+  extends: .tpl:default
+  stage: test
+  script:
+    - 'cd ParserTest'
+    - 'dotnet test'
+
+build:parser:
+  extends: .tpl:default
+  stage: build
+  script:
+    - 'mkdir dist'
+    - 'dotnet publish -c Debug -r linux-x64 -o ../dist ForumParser/ForumParser.csproj'
+  artifacts:
+    name: '$CI_JOB_NAME-$CI_COMMIT_REF_SLUG'
+    paths:
+      - 'dist'
+
+parse:netcup:
+  extends: .tpl:default
+  stage: parse
+  script:
+    - 'COMPlus_DebugWriteToStdErr=1 ./dist/ForumParser https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/ laengstes.json laengstes.html'
+  artifacts:
+    name: '$CI_JOB_NAME-$CI_COMMIT_REF_SLUG'
+    paths:
+      - 'laengstes.json'
+      - 'laengstes.html'

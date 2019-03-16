@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="PerrysNetConsole" Version="1.2.0.1" />
-    <PackageReference Include="PerrysNetConsoleHtml" Version="1.0.0.1" />
+    <PackageReference Include="PerrysNetConsole" Version="2.0.1-alpha" />
+    <PackageReference Include="PerrysNetConsoleHtml" Version="2.0.0-alpha" />
   </ItemGroup>
 
   <ItemGroup>

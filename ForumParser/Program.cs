@@ -34,7 +34,6 @@ namespace ForumParser
             Crawl(url, path);
             
             PrintStats(path, htmloutfile);
-            CoEx.WindowPosY = 0;
             Console.ReadKey();
         }
 

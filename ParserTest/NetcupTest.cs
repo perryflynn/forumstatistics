@@ -25,7 +25,7 @@ namespace ParserTest
         /// <param name="zero">Expect no posts for this user</param>
         [Theory]
         [InlineData("https://forum.netcup.de/user/1320-perryflynn/", "perryflynn", 1320, "2008-12-27", "Enlightened", false)]
-        [InlineData("https://forum.netcup.de/user/3-netcup-felix/", "[netcup] Felix", 3, "2008-02-29", "Geschäftsführer", false)]
+        [InlineData("https://forum.netcup.de/user/3-netcup-felix/", "[netcup] Felix", 3, "2008-02-29", "GeschÃ¤ftsfÃ¼hrer", false)]
         [InlineData("https://forum.netcup.de/user/4-admin/", "admin", 4, "2008-02-29", null, true)]
         public void TestParseUser(string teststr, string username, uint uid, string regdate, string title, bool zero)
         {

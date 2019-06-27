@@ -18,6 +18,18 @@ namespace ForumParser
 
         public string XpathPosts => "//ul[contains(@class, 'wbbThreadPostList')]/li/article";
         public string RegexThreadUid => "data-thread-id=\"([0-9]+)\"";
-        public string RegexCurrentPageNo => "<li class=\"active\"><span>[0-9]+</span><span class=\"invisible\">Page ([0-9]+) of [0-9]+</span></li>";
+        public string RegexCurrentPageNo => "<li class=\"active\"><span>[0-9]+</span><span class=\"invisible\">Page ([0-9,]+) of [0-9,]+</span></li>";
+
+        public Func<string, double> NormalizeNumbersFunc => (number) =>
+        {
+            var temp = number.Trim().Replace(",", "");
+
+            if(double.TryParse(temp, out double parsedNumber))
+            {
+                return parsedNumber;
+            }
+
+            throw new ArgumentException($"Cannot parse '{number}' into a number");
+        };
     }
 }

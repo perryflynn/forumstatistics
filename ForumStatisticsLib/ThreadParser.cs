@@ -72,7 +72,7 @@ namespace PerryFlynn.ForumStatistics.Parser
             return new ForumThread(new UserParser(this.UserInfo))
             {
                 Uid = (await this.ExtractUnsignedInt(threadsitehtml, "thread uid", this.ThreadInfo.RegexThreadUid, 1)).Value,
-                CurrentPageNo = (await this.ExtractUnsignedInt(threadsitehtml, "current page no", this.ThreadInfo.RegexCurrentPageNo, 1)).Value,
+                CurrentPageNo = (uint) this.ThreadInfo.NormalizeNumbersFunc( (await this.ExtractString(threadsitehtml, "current page no", this.ThreadInfo.RegexCurrentPageNo, 1)) ),
                 StartpageUrl = await this.ExtractString(threadsitehtml, "startpage url", this.ThreadInfo.RegexStartUrl, 1),
                 PageCount = (await this.ExtractUnsignedInt(threadsitehtml, "page count", this.ThreadInfo.RegexPageMaxCount, 1)).Value
             };
@@ -88,7 +88,7 @@ namespace PerryFlynn.ForumStatistics.Parser
 
         public virtual async Task<List<ThreadPost>> ExtractPosts(string threadpagehtml, ForumUserCollection users)
         {
-            return await Task.Run(() => 
+            return await Task.Run(() =>
             {
                 var postparser = new PostParser(this.PostInfo, users);
                 var result = new List<ThreadPost>();

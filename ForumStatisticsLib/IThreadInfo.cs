@@ -13,5 +13,6 @@ namespace PerryFlynn.ForumStatistics.Parser
         string RegexPageMaxCount { get; }
         string XpathPosts { get; }
         Func<string, uint, string> BuildPageUrlFunc { get; }
+        Func<string, double> NormalizeNumbersFunc { get; }
     }
 }

@@ -1,7 +1,7 @@
 stages:
   - test
-  - build
-  - parse
+  - run
+
 
 #
 # -> Template
@@ -9,44 +9,40 @@ stages:
 
 .tpl:default:
   image: reg.git.brickburg.de/bbcontainers/dotnetcore:nightly-sdk
-  tags: 
+  tags:
     - docker
 
-.tpl:run:
+.tpl:dotnet:
   extends: .tpl:default
   only:
     - schedules
     - web
+
+.tpl:deploy:
+  extends: .tpl:default
+  image: reg.git.brickburg.de/bbcontainers/hyde:current
+
 
 #
 # -> Jobs
 #
 
 test:parser:
-  extends: .tpl:run
+  extends: .tpl:dotnet
   stage: test
   script:
     - 'cd ParserTest'
     - 'dotnet test'
 
-build:parser:
-  extends: .tpl:run
-  stage: build
+run:buildandrun:
+  extends: .tpl:dotnet
+  stage: run
   script:
     - 'mkdir dist'
     - 'dotnet publish -c Debug -r linux-x64 -o ../dist ForumParser/ForumParser.csproj'
+    - 'mkdir result'
+    - 'COMPlus_DebugWriteToStdErr=1 ./dist/ForumParser https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/ ./result/laengstes.json ./result/laengstes.html'
   artifacts:
     name: '$CI_JOB_NAME-$CI_COMMIT_REF_SLUG'
     paths:
-      - 'dist'
-
-parse:netcup:
-  extends: .tpl:run
-  stage: parse
-  script:
-    - 'COMPlus_DebugWriteToStdErr=1 ./dist/ForumParser https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/ laengstes.json laengstes.html'
-  artifacts:
-    name: '$CI_JOB_NAME-$CI_COMMIT_REF_SLUG'
-    paths:
-      - 'laengstes.json'
-      - 'laengstes.html'
+      - 'result'

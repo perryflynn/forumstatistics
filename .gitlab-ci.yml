@@ -1,6 +1,12 @@
 stages:
   - test
   - run
+  - deploy
+
+variables:
+  serversshuser: 'ssh-w019308c'
+  servername: 'laengstes.serverless.industries'
+  wwwdir: '/www/htdocs/w019308c/vhosts/laengstes.serverless.industries'
 
 
 #
@@ -21,6 +27,19 @@ stages:
 .tpl:deploy:
   extends: .tpl:default
   image: reg.git.brickburg.de/bbcontainers/hyde:current
+  before_script:
+    - 'mkdir ssh'
+    - 'touch ssh/key ssh/hosts'
+    - 'chmod u=rwx,go=- ssh'
+    - 'chmod u=rw,go=- ssh/key ssh/hosts'
+    - 'echo "${SSH_DEPLOY_KEY}" > ssh/key'
+    - 'ssh-keyscan -H ${servername} > ssh/hosts'
+  after_script:
+    - 'rm -rf ssh'
+  variables:
+    sshopts: '-o UserKnownHostsFile=ssh/hosts -i ssh/key'
+    sshremote: '${serversshuser}@${servername}'
+
 
 
 #
@@ -46,3 +65,10 @@ run:buildandrun:
     name: '$CI_JOB_NAME-$CI_COMMIT_REF_SLUG'
     paths:
       - 'result'
+
+.deploy:laengstes:
+  extends: .tpl:deploy
+  stage: deploy
+  script:
+    - 'ssh ${sshopts} ${sshremote} "rm -rf ${wwwdir}/*"'
+    - 'scp -r ${sshopts} result/laengstes.html ${sshremote}:${wwwdir}/index.html'

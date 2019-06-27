@@ -30,9 +30,9 @@ variables:
   image: reg.git.brickburg.de/bbcontainers/hyde:current
   before_script:
     - 'mkdir ssh'
-    - 'touch ssh/key ssh/hosts'
+    - 'touch ssh/hosts'
     - 'chmod u=rwx,go=- ssh'
-    - 'chmod u=rw,go=- ssh/key ssh/hosts'
+    - 'chmod u=rw,go=- ssh/hosts'
     - 'ssh-keyscan -H ${servername} > ssh/hosts'
   after_script:
     - 'rm -rf ssh'

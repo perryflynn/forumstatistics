@@ -14,15 +14,16 @@ variables:
 #
 
 .tpl:default:
-  image: reg.git.brickburg.de/bbcontainers/dotnetcore:nightly-sdk
+  image: reg.git.brickburg.de/bbcontainers/base-stretch:nightly
+  only:
+    - schedules
+    - web
   tags:
     - docker
 
 .tpl:dotnet:
+  image: reg.git.brickburg.de/bbcontainers/dotnetcore:nightly-sdk
   extends: .tpl:default
-  only:
-    - schedules
-    - web
 
 .tpl:deploy:
   extends: .tpl:default
@@ -39,7 +40,6 @@ variables:
   variables:
     sshopts: '-o UserKnownHostsFile=ssh/hosts -i ${SSH_DEPLOY_KEY}'
     sshremote: '${serversshuser}@${servername}'
-
 
 
 #

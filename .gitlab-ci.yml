@@ -32,12 +32,12 @@ variables:
     - 'touch ssh/key ssh/hosts'
     - 'chmod u=rwx,go=- ssh'
     - 'chmod u=rw,go=- ssh/key ssh/hosts'
-    - 'echo "${SSH_DEPLOY_KEY}" > ssh/key'
     - 'ssh-keyscan -H ${servername} > ssh/hosts'
   after_script:
     - 'rm -rf ssh'
+    - 'rm -rf ${SSH_DEPLOY_KEY}'
   variables:
-    sshopts: '-o UserKnownHostsFile=ssh/hosts -i ssh/key'
+    sshopts: '-o UserKnownHostsFile=ssh/hosts -i ${SSH_DEPLOY_KEY}'
     sshremote: '${serversshuser}@${servername}'
 
 

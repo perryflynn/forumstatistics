@@ -60,7 +60,7 @@ run:buildandrun:
     - 'mkdir dist'
     - 'dotnet publish -c Debug -r linux-x64 -o ../dist ForumParser/ForumParser.csproj'
     - 'mkdir result'
-     - 'COMPlus_DebugWriteToStdErr=1 ./dist/ForumParser https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/ ./result/laengstes.json ./result/laengstes.html'
+    - 'COMPlus_DebugWriteToStdErr=1 ./dist/ForumParser https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/ ./result/laengstes.json ./result/laengstes.html'
   artifacts:
     name: '$CI_JOB_NAME-$CI_COMMIT_REF_SLUG'
     paths:

@@ -30,15 +30,15 @@ variables:
   image: reg.git.brickburg.de/bbcontainers/hyde:current
   before_script:
     - 'mkdir ssh'
-    - 'touch ssh/hosts'
+    - 'touch ssh/hosts ssh/key'
     - 'chmod u=rwx,go=- ssh'
-    - 'chmod u=rw,go=- ssh/hosts'
+    - 'chmod u=rw,go=- ssh/hosts ssh/key'
+    - 'echo "${SSH_DEPLOY_KEY}" > ssh/key'
     - 'ssh-keyscan -H ${servername} > ssh/hosts'
   after_script:
     - 'rm -rf ssh'
-    - 'rm -rf ${SSH_DEPLOY_KEY}'
   variables:
-    sshopts: '-o UserKnownHostsFile=ssh/hosts -i ${SSH_DEPLOY_KEY}'
+    sshopts: '-o UserKnownHostsFile=ssh/hosts -i ssh/key'
     sshremote: '${serversshuser}@${servername}'
 
 
@@ -58,9 +58,10 @@ run:buildandrun:
   stage: run
   script:
     - 'mkdir dist'
-    - 'dotnet publish -c Debug -r linux-x64 -o ../dist ForumParser/ForumParser.csproj'
+    #- 'dotnet publish -c Debug -r linux-x64 -o ../dist ForumParser/ForumParser.csproj'
     - 'mkdir result'
-    - 'COMPlus_DebugWriteToStdErr=1 ./dist/ForumParser https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/ ./result/laengstes.json ./result/laengstes.html'
+    # - 'COMPlus_DebugWriteToStdErr=1 ./dist/ForumParser https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/ ./result/laengstes.json ./result/laengstes.html'
+    - 'echo hello > ./result/laengstes.html'
   artifacts:
     name: '$CI_JOB_NAME-$CI_COMMIT_REF_SLUG'
     paths:

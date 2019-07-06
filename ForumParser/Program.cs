@@ -61,7 +61,7 @@ namespace ForumParser
             var template = Path.Combine(dir, "template.html");
 
             using (var thread = Load(path))
-            using (var writer = new CoExHtmlWriter(File.ReadAllText(template)) { Title = "Das Längste" }) 
+            using (var writer = new CoExHtmlWriter(File.ReadAllText(template)) { Title = "Das Längste" })
             {
                 CoEx.WriteTitleLarge($"Statistics for {thread.StartpageUrl}");
                 CoEx.WriteLine();
@@ -283,6 +283,11 @@ namespace ForumParser
 
 
                 //--> Year statistics
+                var yearmaxlength = cleanposts
+                    .GroupBy(v => v.Date.Year)
+                    .Select(v => v.Count().ToString().Length)
+                    .Max();
+
                 var yearstats = cleanposts
                     .GroupBy(v => v.Date.Year)
                     .Select(v => new string[]
@@ -306,6 +311,19 @@ namespace ForumParser
                         "Largest Msg"
                     });
 
+                var yeargraphstats = cleanposts
+                    .GroupBy(v => v.Date.Year)
+                    .Select(v => new dynamic[]
+                    {
+                        v.Key.ToString(),
+                        v.Count(),
+                    })
+                    .OrderByDescending(v => (string)v[0])
+                    //.Take(63)
+                    .Take((int)((CoEx.ForcedBufferWidth.Value - yearmaxlength - 4) / 2))
+                    .OrderBy(v => (string)v[0])
+                    .ToDictionary(key => (string)key[0], value => (double)value[1]);
+
                 var yearrows = RowCollection.Create(yearstats.ToArray());
                 yearrows.Settings.Border.Enabled = true;
 
@@ -323,6 +341,11 @@ namespace ForumParser
                 };
 
                 CoEx.WriteTitle("Statistics by year");
+                var graph = new SimpleGraph() { Height = 15 };
+
+                graph.Draw(yeargraphstats);
+                CoEx.WriteLine();
+
                 CoEx.WriteTable(yearrows);
                 CoEx.WriteLine();
 
@@ -350,6 +373,24 @@ namespace ForumParser
                         "Largest Msg"
                     });
 
+                var monthmaxlength = cleanposts
+                    .GroupBy(v => v.Date.GetMonth())
+                    .Select(v => v.Count().ToString().Length)
+                    .Max();
+
+                var monthgraphstats = cleanposts
+                    .GroupBy(v => v.Date.GetMonth())
+                    .Select(v => new dynamic[]
+                    {
+                        v.Key.ToString("yyMM"),
+                        v.Count(),
+                    })
+                    .OrderByDescending(v => (string)v[0])
+                    //.Take(63)
+                    .Take((int)((CoEx.ForcedBufferWidth.Value - monthmaxlength - 4) / 2))
+                    .OrderBy(v => (string)v[0])
+                    .ToDictionary(key => (string)key[0], value => (double)value[1]);
+
                 var monthrows = RowCollection.Create(monthstats.ToArray());
                 monthrows.Settings.Border.Enabled = true;
 
@@ -367,6 +408,10 @@ namespace ForumParser
                 };
 
                 CoEx.WriteTitle("Statistics by month");
+
+                graph.Draw(monthgraphstats);
+                CoEx.WriteLine();
+
                 CoEx.WriteTable(monthrows);
                 CoEx.WriteLine();
 

@@ -57,11 +57,8 @@ namespace ForumParser
 
         private static void PrintStats(string path, string htmloutfile)
         {
-            var dir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-            var template = Path.Combine(dir, "template.html");
-
             using (var thread = Load(path))
-            using (var writer = new CoExHtmlWriter(File.ReadAllText(template)) { Title = "Das Längste" })
+            using (var writer = new CoExHtmlWriter() { Title = "Das Längste" })
             {
                 CoEx.WriteTitleLarge($"Statistics for {thread.StartpageUrl}");
                 CoEx.WriteLine();

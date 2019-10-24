@@ -9,6 +9,7 @@
         string RegexPostUrl { get; }
         string RegexUserUrl { get; }
         string RegexUserUid { get; }
+        string RegexUsername { get; }
         string RegexDate { get; }
         string DateFormat { get; }
         string XpathMessageHtml { get; }

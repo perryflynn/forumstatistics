@@ -11,9 +11,6 @@ namespace PerryFlynn.ForumStatistics.Parser
     /// </summary>
     public abstract class Parser : IDisposable
     {
-
-        public abstract void Dispose();
-
         public HttpClient Client { get; set; }
 
         public Parser()
@@ -21,9 +18,26 @@ namespace PerryFlynn.ForumStatistics.Parser
             this.Client = this.InitializeHttpClient();
         }
 
+        public virtual void Dispose()
+        {
+            if(this.Client != null)
+            {
+                this.Client.Dispose();
+                this.Client = null;
+            }
+        }
+
         protected virtual HttpClient InitializeHttpClient()
         {
-            var client = new HttpClient();
+            var handler = new HttpClientHandler()
+            {
+                AllowAutoRedirect = true,
+                MaxAutomaticRedirections = 999,
+                UseCookies = true,
+                CookieContainer = new System.Net.CookieContainer()
+            };
+
+            var client = new HttpClient(handler, true);
             client.DefaultRequestHeaders.Add("User-Agent", "perryflynns Forum Statistics Crawler");
             client.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9,de;q=0.8");
             return client;

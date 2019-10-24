@@ -25,6 +25,7 @@ namespace PerryFlynn.ForumStatistics.Parser
         public virtual async Task<ThreadPost> Parse(string posthtml)
         {
             var userurl = await this.ExtractString(posthtml, "post user url", this.Info.RegexUserUrl, 1, true, null);
+            var username = await this.ExtractString(posthtml, "post username", this.Info.RegexUsername, 1, true, null);
             var useruid = await this.ExtractUnsignedInt(posthtml, "post user uid", this.Info.RegexUserUid, 1, true, null);
 
             bool guestpost = false;
@@ -32,7 +33,7 @@ namespace PerryFlynn.ForumStatistics.Parser
             string guestusername = null;
             string guesttitle = null;
 
-            if (userurl == null)
+            if (userurl == null || username == null)
             {
                 guestpost = true;
                 guestusername = await this.ExtractString(posthtml, "guest username", this.Info.RegexGuestUsername, 1);

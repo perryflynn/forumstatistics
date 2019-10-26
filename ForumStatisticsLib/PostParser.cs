@@ -15,11 +15,13 @@ namespace PerryFlynn.ForumStatistics.Parser
 
         public IPostInfo Info { get; private set; }
         public ForumUserCollection Users { get; private set; }
+        public SearchPageParser SearchParser { get; set; }
 
-        public PostParser(IPostInfo info, ForumUserCollection users) : base()
+        public PostParser(IPostInfo info, SearchPageParser userParser, ForumUserCollection users) : base()
         {
             this.Info = info;
             this.Users = users;
+            this.SearchParser = userParser;
         }
 
         public virtual async Task<ThreadPost> Parse(string posthtml)
@@ -42,7 +44,24 @@ namespace PerryFlynn.ForumStatistics.Parser
             else
             {
                 guestpost = false;
-                user = this.Users.GetOrImport(userurl);
+                if (this.Users.Contains(username))
+                {
+                    user = this.Users.Get(username);
+                }
+                else
+                {
+                    var searchResult = await this.SearchParser.SearchUser(username);
+                    if(searchResult.Count > 0)
+                    {
+                        searchResult.ForEach(u => this.Users.Import(u));
+                        user = this.Users.Get(username);
+                    }
+                }
+            }
+
+            if(user == null && guestusername == null)
+            {
+                throw new Exception("Could not extract user");
             }
 
             var post = new ThreadPost()

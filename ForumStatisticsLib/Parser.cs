@@ -32,7 +32,7 @@ namespace PerryFlynn.ForumStatistics.Parser
             var handler = new HttpClientHandler()
             {
                 AllowAutoRedirect = true,
-                MaxAutomaticRedirections = 999,
+                MaxAutomaticRedirections = 42,
                 UseCookies = true,
                 CookieContainer = new System.Net.CookieContainer()
             };

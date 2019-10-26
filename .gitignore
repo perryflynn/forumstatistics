@@ -1,3 +1,7 @@
+*.html
+*.json
+!ForumParser/template.html
+
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

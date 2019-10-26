@@ -44,7 +44,7 @@ namespace ForumParser
 
         private static void Crawl(string url, string path)
         {
-            var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo());
+            var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
 
             var thread = parser.ParseThread(new Uri(url)).Result;
             thread.Serialize(new FileInfo(path));

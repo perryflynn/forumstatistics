@@ -15,12 +15,14 @@ namespace PerryFlynn.ForumStatistics.Parser
         public IThreadInfo ThreadInfo { get; private set; }
         public IPostInfo PostInfo { get; private set; }
         public IUserInfo UserInfo { get; private set; }
+        public IUserSearchInfo SearchInfo { get; set; }
 
-        public ThreadParser(IThreadInfo threadinfo, IPostInfo postinfo, IUserInfo userinfo) : base()
+        public ThreadParser(IThreadInfo threadinfo, IPostInfo postinfo, IUserInfo userinfo, IUserSearchInfo searchInfo) : base()
         {
             this.ThreadInfo = threadinfo;
             this.PostInfo = postinfo;
             this.UserInfo = userinfo;
+            this.SearchInfo = searchInfo;
         }
 
         public async Task<ForumThread> ParseThread(Uri threadpageurl)
@@ -90,7 +92,8 @@ namespace PerryFlynn.ForumStatistics.Parser
         {
             return await Task.Run(() =>
             {
-                var postparser = new PostParser(this.PostInfo, users);
+                var searchparser = new SearchPageParser(this.SearchInfo);
+                var postparser = new PostParser(this.PostInfo, searchparser, users);
                 var result = new List<ThreadPost>();
 
                 var doc = new HtmlDocument();
@@ -112,6 +115,7 @@ namespace PerryFlynn.ForumStatistics.Parser
             this.ThreadInfo = null;
             this.PostInfo = null;
             this.UserInfo = null;
+            this.SearchInfo = null;
         }
 
     }

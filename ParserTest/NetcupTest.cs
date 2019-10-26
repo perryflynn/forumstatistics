@@ -29,8 +29,16 @@ namespace ParserTest
         [InlineData("https://forum.netcup.de/user/4-admin/", "admin", 4, "2008-02-29", null, true)]
         public void TestParseUser(string teststr, string username, uint uid, string regdate, string title, bool zero)
         {
+            var usersearch = new SearchPageParser(new NetcupSearchInfo());
             var parser = new UserParser(new NetcupUserInfo());
-            var user = parser.ParseUserPage(new Uri(teststr)).Result;
+
+            var users = new ForumUserCollection(parser);
+            foreach(var newUser in usersearch.SearchUser(username).Result)
+            {
+                users.Import(newUser);
+            }
+
+            var user = users.Get(username);
 
             Assert.Equal<uint>(uid, user.Uid);
             Assert.Equal(teststr, user.Url);
@@ -48,7 +56,7 @@ namespace ParserTest
         [InlineData("https://forum.netcup.de/sonstiges/smalltalk/p13789-das-l%C3%A4ngste-thema/")]
         public void TestGuestUserPost(string url)
         {
-            var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo());
+            var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
             var thread = parser.ParseThread(new Uri(url), 30, 30).Result;
 
             Assert.Contains(thread.Posts, v => v.IsGuestPost && string.IsNullOrEmpty(v.GuestUsername) == false);
@@ -62,8 +70,11 @@ namespace ParserTest
         [InlineData("https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/?pageNo=760")]
         public void TestParseThread(string teststr)
         {
-            var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo());
+            var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
             var thread = parser.ParseThread(new Uri(teststr), 1, 3).Result;
+
+            var postUsers = thread.Posts.Where(v => v.User != null).Select(v => v.User).Distinct();
+            var userIntersects = thread.Users.Users.Intersect(postUsers);
 
             Assert.Equal("https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/", thread.StartpageUrl);
             Assert.True(thread.PageCount >= 383);
@@ -71,7 +82,7 @@ namespace ParserTest
             Assert.True(thread.Uid > 0);
             Assert.True(thread.Posts.Count > 0);
             Assert.True(thread.Users.Users.Count > 0);
-            Assert.Equal<int>(thread.Posts.Where(v => v.User != null).Select(v => v.User).Distinct().Count(), thread.Users.Users.Count);
+            Assert.Equal<int>(postUsers.Count(), userIntersects.Count());
         }
 
         /// <summary>
@@ -89,7 +100,7 @@ namespace ParserTest
         [InlineData("https://forum.netcup.de/sonstiges/smalltalk/p13789-das-l%C3%A4ngste-thema/#post13789", 30, 13789, false, false, false)]
         public void TestPostParser(string url, uint page, uint postuid, bool haslikes, bool hassiganture, bool hasuser)
         {
-            var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo());
+            var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
             var thread = parser.ParseThread(new Uri(url.Substring(0, url.IndexOf('#'))), page, page).Result;
 
             var post = thread.Posts.Where(v => v.Uid == postuid).Single();

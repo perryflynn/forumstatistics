@@ -38,11 +38,11 @@ namespace PerryFlynn.ForumStatistics.Parser
             return this.Users.Any(v => v.Uri == uri);
         }
 
-        public bool Import(string url)
+        public bool Import(Uri url)
         {
-            if (!this.Contains(new Uri(url)))
+            if (!this.Contains(url))
             {
-                var user = this.UserParser.ParseUserPage(new Uri(url)).Result;
+                var user = this.UserParser.ParseUserPage(url).Result;
                 if (!this.Contains(user.Uid))
                 {
                     this.Users.Add(user);
@@ -52,13 +52,40 @@ namespace PerryFlynn.ForumStatistics.Parser
             return false;
         }
 
-        public ForumUser GetOrImport(string url)
+        public bool Import(string userSiteHtml)
         {
-            if (!this.Contains(new Uri(url)))
+            var user = this.UserParser.ParseUserPage(userSiteHtml).Result;
+            if(!this.Contains(user.Username))
+            {
+                this.Users.Add(user);
+                return true;
+            }
+            return false;
+        }
+
+        public ForumUser Get(string username)
+        {
+            return this.Users.Single(u => u.Username==username);
+        }
+
+        public ForumUser GetOrImport(Uri url)
+        {
+            if (!this.Contains(url))
             {
                 this.Import(url);
             }
-            return this.Users.Where(v => v.Url == url).Single();
+            return this.Users.Single(v => v.Url == url.ToString());
+        }
+
+        public ForumUser GetOrImport(string userSiteHtml)
+        {
+            var user = this.UserParser.ParseUserPage(userSiteHtml).Result;
+            if(!this.Contains(user.Username))
+            {
+                this.Users.Add(user);
+                return user;
+            }
+            return user;
         }
 
         public void Dispose()

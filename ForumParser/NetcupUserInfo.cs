@@ -11,12 +11,15 @@ namespace ForumParser
     /// </summary>
     public class NetcupUserInfo : IUserInfo
     {
-        public string RegexUid => "<link rel=\"canonical\" href=\".+/user/([0-9]+)[^/]*?/\">";
-        public string RegexUsername => "<meta property=\"profile:username\" content=\"([^\"]+)\">";
+        //public string RegexUid => "<link rel=\"canonical\" href=\".+/user/([0-9]+)[^/]*?/\">";
+        public string RegexUid => "data-object-id=\"([0-9]+)\"";
+        //public string RegexUsername => "<meta property=\"profile:username\" content=\"([^\"]+)\">";
+        public string RegexUsername => "class=\"username userLink\" data-user-id=\"[0-9]+\">([^<]+)</a>";
         public string RegexUserTitle => "<span class=\"[^\"]*userTitleBadge[^\"]*\">([^<]+)</span>";
         public string RegexRegistrationDateString => "<li>Member since ([^<]+)</li>";
         public string RegexPostCount => "<dt><a href=\"[^\"]+\" title=\"Posts by [^\"]+\" class=\"jsTooltip\">Posts</a></dt>\\s*<dd>([0-9,]+)</dd>";
-        public string RegexUrl => "<meta property=\"og:url\" content=\"([^\"]+)\">";
+        //public string RegexUrl => "<meta property=\"og:url\" content=\"([^\"]+)\">";
+        public string RegexUrl => "<h3><a href=\"([^\"]+)\" class=\"username userLink\"";
 
         public Func<string, DateTime> RegistrationDateParseFunc => (str) =>
         {

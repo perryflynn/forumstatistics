@@ -43,7 +43,7 @@ namespace PerryFlynn.ForumStatistics.Parser
             return client;
         }
 
-        protected async Task<uint?> ExtractUnsignedInt(string content, string propertyname, string regex, int group, bool usedefaultvalue, uint? defaultvalue)
+        protected async Task<uint?> ExtractUnsignedIntAsync(string content, string propertyname, string regex, int group, bool usedefaultvalue, uint? defaultvalue)
         {
             return await Task.Run(() =>
             {
@@ -60,12 +60,12 @@ namespace PerryFlynn.ForumStatistics.Parser
             });
         }
 
-        protected async Task<uint?> ExtractUnsignedInt(string content, string propertyname, string regex, int group)
+        protected async Task<uint?> ExtractUnsignedIntAsync(string content, string propertyname, string regex, int group)
         {
-            return await this.ExtractUnsignedInt(content, propertyname, regex, group, false, null);
+            return await this.ExtractUnsignedIntAsync(content, propertyname, regex, group, false, null);
         }
 
-        protected virtual async Task<string> ExtractString(string content, string propertyname, string regex, int group, bool usedefaultvalue, string defaultvalue)
+        protected virtual async Task<string> ExtractStringAsync(string content, string propertyname, string regex, int group, bool usedefaultvalue, string defaultvalue)
         {
             return await Task.Run(() =>
             {
@@ -82,16 +82,16 @@ namespace PerryFlynn.ForumStatistics.Parser
             });
         }
 
-        protected virtual async Task<string> ExtractString(string content, string propertyname, string regex, int group)
+        protected virtual async Task<string> ExtractStringAsync(string content, string propertyname, string regex, int group)
         {
-            return await this.ExtractString(content, propertyname, regex, group, false, null);
+            return await this.ExtractStringAsync(content, propertyname, regex, group, false, null);
         }
 
-        protected virtual async Task<DateTime?> ExtractDateTime(string content, string propertyname, string regex, int group, string dateformat, bool usedefaultvalue, DateTime? defaultvalue)
+        protected virtual async Task<DateTime?> ExtractDateTimeAsync(string content, string propertyname, string regex, int group, string dateformat, bool usedefaultvalue, DateTime? defaultvalue)
         {
             try
             {
-                string strdate = await this.ExtractString(content, propertyname, regex, group);
+                string strdate = await this.ExtractStringAsync(content, propertyname, regex, group);
                 return DateTime.ParseExact(strdate, dateformat, CultureInfo.InvariantCulture);
             }
             catch (Exception ex) when (usedefaultvalue && (ex is ArgumentNullException || ex is FormatException))
@@ -100,9 +100,9 @@ namespace PerryFlynn.ForumStatistics.Parser
             }
         }
 
-        protected virtual async Task<DateTime?> ExtractDateTime(string content, string propertyname, string regex, int group, string dateformat)
+        protected virtual async Task<DateTime?> ExtractDateTimeAsync(string content, string propertyname, string regex, int group, string dateformat)
         {
-            return await this.ExtractDateTime(content, propertyname, regex, group, dateformat, false, null);
+            return await this.ExtractDateTimeAsync(content, propertyname, regex, group, dateformat, false, null);
         }
 
     }

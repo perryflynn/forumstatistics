@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Threading.Tasks;
@@ -39,11 +38,11 @@ namespace PerryFlynn.ForumStatistics.Parser
             return this.Users.Any(v => v.Uri == uri);
         }
 
-        public async Task<bool> Import(Uri url)
+        public async Task<bool> ImportAsync(Uri url)
         {
             if (!this.Contains(url))
             {
-                var user = await this.UserParser.ParseUserPage(url);
+                var user = await this.UserParser.ParseUserPageAsync(url);
                 if (!this.Contains(user.Uid))
                 {
                     this.Users.Add(user);
@@ -53,10 +52,10 @@ namespace PerryFlynn.ForumStatistics.Parser
             return false;
         }
 
-        public async Task<bool> Import(string userSiteHtml)
+        public async Task<bool> ImportAsync(string userSiteHtml)
         {
-            var user = await this.UserParser.ParseUserPage(userSiteHtml);
-            if(!this.Contains(user.Username))
+            var user = await this.UserParser.ParseUserPageAsync(userSiteHtml);
+            if (!this.Contains(user.Username))
             {
                 this.Users.Add(user);
                 return true;
@@ -66,22 +65,22 @@ namespace PerryFlynn.ForumStatistics.Parser
 
         public ForumUser Get(string username)
         {
-            return this.Users.Single(u => u.Username==username);
+            return this.Users.Single(u => u.Username == username);
         }
 
-        public async Task<ForumUser> GetOrImport(Uri url)
+        public async Task<ForumUser> GetOrImportAsync(Uri url)
         {
             if (!this.Contains(url))
             {
-                await this.Import(url);
+                await this.ImportAsync(url);
             }
             return this.Users.Single(v => v.Url == url.ToString());
         }
 
-        public async Task<ForumUser> GetOrImport(string userSiteHtml)
+        public async Task<ForumUser> GetOrImportAsync(string userSiteHtml)
         {
-            var user = await this.UserParser.ParseUserPage(userSiteHtml);
-            if(!this.Contains(user.Username))
+            var user = await this.UserParser.ParseUserPageAsync(userSiteHtml);
+            if (!this.Contains(user.Username))
             {
                 this.Users.Add(user);
                 return user;

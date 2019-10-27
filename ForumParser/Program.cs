@@ -49,7 +49,7 @@ namespace ForumParser
 
             var task = Task.Run(async () =>
             {
-                var thread = await parser.ParseThread(new Uri(url));
+                var thread = await parser.ParseThreadAsync(new Uri(url));
                 thread.Serialize(new FileInfo(path));
             });
 
@@ -325,7 +325,6 @@ namespace ForumParser
                         v.Count(),
                     })
                     .OrderByDescending(v => (string)v[0])
-                    //.Take(63)
                     .Take((int)((CoEx.ForcedBufferWidth.Value - yearmaxlength - 4) / 2))
                     .OrderBy(v => (string)v[0])
                     .ToDictionary(key => (string)key[0], value => (double)value[1]);
@@ -392,7 +391,6 @@ namespace ForumParser
                         v.Count(),
                     })
                     .OrderByDescending(v => (string)v[0])
-                    //.Take(63)
                     .Take((int)((CoEx.ForcedBufferWidth.Value - monthmaxlength - 4) / 2))
                     .OrderBy(v => (string)v[0])
                     .ToDictionary(key => (string)key[0], value => (double)value[1]);

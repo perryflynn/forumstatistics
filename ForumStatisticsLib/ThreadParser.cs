@@ -25,22 +25,22 @@ namespace PerryFlynn.ForumStatistics.Parser
             this.SearchInfo = searchInfo;
         }
 
-        public async Task<ForumThread> ParseThread(Uri threadpageurl)
+        public async Task<ForumThread> ParseThreadAsync(Uri threadpageurl)
         {
-            return await this.ParseThread(threadpageurl, null, null);
+            return await this.ParseThreadAsync(threadpageurl, null, null);
         }
 
-        public async Task<ForumThread> ParseThread(Uri threadpageurl, uint? startpage, uint? lastpage)
+        public async Task<ForumThread> ParseThreadAsync(Uri threadpageurl, uint? startpage, uint? lastpage)
         {
             Thread.Sleep(200);
             var response = await this.Client.GetAsync(threadpageurl);
             var html = await response.Content.ReadAsStringAsync();
-            return await this.ParseThread(html, startpage, lastpage);
+            return await this.ParseThreadAsync(html, startpage, lastpage);
         }
 
-        public async Task<ForumThread> ParseThread(string threadpagehtml, uint? startpage, uint? lastpage)
+        public async Task<ForumThread> ParseThreadAsync(string threadpagehtml, uint? startpage, uint? lastpage)
         {
-            var thread = await this.ParseThreadMetadata(threadpagehtml);
+            var thread = await this.ParseThreadMetadataAsync(threadpagehtml);
 
             if (startpage.HasValue && startpage.Value < 1)
             {
@@ -56,39 +56,39 @@ namespace PerryFlynn.ForumStatistics.Parser
             {
                 var pageurl = this.ThreadInfo.BuildPageUrlFunc(thread.StartpageUrl, i);
                 System.Diagnostics.Debug.WriteLine("Fetch " + pageurl);
-                thread.Posts.AddRange(await this.ExtractPosts(new Uri(pageurl), thread.Users));
+                thread.Posts.AddRange(await this.ExtractPostsAsync(new Uri(pageurl), thread.Users));
             }
 
             return thread;
         }
 
-        public async Task<ForumThread> ParseThreadMetadata(Uri threadpageurl)
+        public async Task<ForumThread> ParseThreadMetadataAsync(Uri threadpageurl)
         {
             var response = await this.Client.GetAsync(threadpageurl);
             var html = await response.Content.ReadAsStringAsync();
-            return await this.ParseThreadMetadata(html);
+            return await this.ParseThreadMetadataAsync(html);
         }
 
-        public async Task<ForumThread> ParseThreadMetadata(string threadsitehtml)
+        public async Task<ForumThread> ParseThreadMetadataAsync(string threadsitehtml)
         {
             return new ForumThread(new UserParser(this.UserInfo))
             {
-                Uid = (await this.ExtractUnsignedInt(threadsitehtml, "thread uid", this.ThreadInfo.RegexThreadUid, 1)).Value,
-                CurrentPageNo = (uint) this.ThreadInfo.NormalizeNumbersFunc( (await this.ExtractString(threadsitehtml, "current page no", this.ThreadInfo.RegexCurrentPageNo, 1)) ),
-                StartpageUrl = await this.ExtractString(threadsitehtml, "startpage url", this.ThreadInfo.RegexStartUrl, 1),
-                PageCount = (await this.ExtractUnsignedInt(threadsitehtml, "page count", this.ThreadInfo.RegexPageMaxCount, 1)).Value
+                Uid = (await this.ExtractUnsignedIntAsync(threadsitehtml, "thread uid", this.ThreadInfo.RegexThreadUid, 1)).Value,
+                CurrentPageNo = (uint) this.ThreadInfo.NormalizeNumbersFunc( (await this.ExtractStringAsync(threadsitehtml, "current page no", this.ThreadInfo.RegexCurrentPageNo, 1)) ),
+                StartpageUrl = await this.ExtractStringAsync(threadsitehtml, "startpage url", this.ThreadInfo.RegexStartUrl, 1),
+                PageCount = (await this.ExtractUnsignedIntAsync(threadsitehtml, "page count", this.ThreadInfo.RegexPageMaxCount, 1)).Value
             };
         }
 
-        public async Task<List<ThreadPost>> ExtractPosts(Uri threadpageurl, ForumUserCollection users)
+        public async Task<List<ThreadPost>> ExtractPostsAsync(Uri threadpageurl, ForumUserCollection users)
         {
             Thread.Sleep(200);
             var response = await this.Client.GetAsync(threadpageurl);
             var html = await response.Content.ReadAsStringAsync();
-            return await this.ExtractPosts(html, users);
+            return await this.ExtractPostsAsync(html, users);
         }
 
-        public virtual async Task<List<ThreadPost>> ExtractPosts(string threadpagehtml, ForumUserCollection users)
+        public virtual async Task<List<ThreadPost>> ExtractPostsAsync(string threadpagehtml, ForumUserCollection users)
         {
             var searchparser = new SearchPageParser(this.SearchInfo);
             var postparser = new PostParser(this.PostInfo, searchparser, users);
@@ -101,7 +101,7 @@ namespace PerryFlynn.ForumStatistics.Parser
 
             foreach (var post in posts)
             {
-                result.Add(await postparser.Parse(post.OuterHtml));
+                result.Add(await postparser.ParseAsync(post.OuterHtml));
             }
 
             return result;

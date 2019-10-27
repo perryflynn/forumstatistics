@@ -30,10 +30,10 @@ namespace PerryFlynn.ForumStatistics.Parser
         {
             var response = await this.Client.GetAsync(this.Info.SearchPageUrl);
             var html = await response.Content.ReadAsStringAsync();
-            return await this.ExtractString(html, "form token", this.Info.SearchTokenRegex, 1, true, null);
+            return await this.ExtractStringAsync(html, "form token", this.Info.SearchTokenRegex, 1, true, null);
         }
 
-        public async Task<List<string>> SearchUser(string username, bool retry = false)
+        public async Task<List<string>> SearchUserAsync(string username, bool retry = false)
         {
             Thread.Sleep(200);
 
@@ -52,7 +52,7 @@ namespace PerryFlynn.ForumStatistics.Parser
                 if(retry == false)
                 {
                     this.FormToken = await this.GetFormTokenAsync();
-                    return await this.SearchUser(username, true);
+                    return await this.SearchUserAsync(username, true);
                 }
                 else
                 {

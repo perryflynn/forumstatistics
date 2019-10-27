@@ -1,7 +1,4 @@
 ﻿using PerryFlynn.ForumStatistics.Parser;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ForumParser
 {

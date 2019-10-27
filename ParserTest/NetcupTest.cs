@@ -2,7 +2,6 @@ using ForumParser;
 using PerryFlynn.ForumStatistics.Parser;
 using System;
 using System.Globalization;
-using System.IO;
 using Xunit;
 using System.Linq;
 using System.Threading.Tasks;
@@ -36,9 +35,9 @@ namespace ParserTest
             var parser = new UserParser(new NetcupUserInfo());
 
             var users = new ForumUserCollection(parser);
-            foreach(var newUser in await usersearch.SearchUser(username))
+            foreach(var newUser in await usersearch.SearchUserAsync(username))
             {
-                await users.Import(newUser);
+                await users.ImportAsync(newUser);
             }
 
             var user = users.Get(username);
@@ -61,7 +60,7 @@ namespace ParserTest
         public async Task TestGuestUserPost(string url)
         {
             var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
-            var thread = await parser.ParseThread(new Uri(url), 30, 30);
+            var thread = await parser.ParseThreadAsync(new Uri(url), 30, 30);
 
             Assert.Contains(thread.Posts, v => v.IsGuestPost && string.IsNullOrEmpty(v.GuestUsername) == false);
         }
@@ -75,7 +74,7 @@ namespace ParserTest
         public async Task TestParseThread(string teststr)
         {
             var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
-            var thread = await parser.ParseThread(new Uri(teststr), 1, 3);
+            var thread = await parser.ParseThreadAsync(new Uri(teststr), 1, 3);
 
             var postUsers = thread.Posts.Where(v => v.User != null).Select(v => v.User).Distinct();
             var userIntersects = thread.Users.Users.Intersect(postUsers);
@@ -105,7 +104,7 @@ namespace ParserTest
         public async Task TestPostParser(string url, uint page, uint postuid, bool haslikes, bool hassiganture, bool hasuser)
         {
             var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
-            var thread = await parser.ParseThread(new Uri(url.Substring(0, url.IndexOf('#'))), page, page);
+            var thread = await parser.ParseThreadAsync(new Uri(url.Substring(0, url.IndexOf('#'))), page, page);
 
             var post = thread.Posts.Where(v => v.Uid == postuid).Single();
 

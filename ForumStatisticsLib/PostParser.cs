@@ -1,7 +1,5 @@
 ﻿using HtmlAgilityPack;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 
@@ -24,11 +22,11 @@ namespace PerryFlynn.ForumStatistics.Parser
             this.SearchParser = userParser;
         }
 
-        public virtual async Task<ThreadPost> Parse(string posthtml)
+        public virtual async Task<ThreadPost> ParseAsync(string posthtml)
         {
-            var userurl = await this.ExtractString(posthtml, "post user url", this.Info.RegexUserUrl, 1, true, null);
-            var username = await this.ExtractString(posthtml, "post username", this.Info.RegexUsername, 1, true, null);
-            var useruid = await this.ExtractUnsignedInt(posthtml, "post user uid", this.Info.RegexUserUid, 1, true, null);
+            var userurl = await this.ExtractStringAsync(posthtml, "post user url", this.Info.RegexUserUrl, 1, true, null);
+            var username = await this.ExtractStringAsync(posthtml, "post username", this.Info.RegexUsername, 1, true, null);
+            var useruid = await this.ExtractUnsignedIntAsync(posthtml, "post user uid", this.Info.RegexUserUid, 1, true, null);
 
             bool guestpost = false;
             ForumUser user = null;
@@ -38,8 +36,8 @@ namespace PerryFlynn.ForumStatistics.Parser
             if (userurl == null || username == null)
             {
                 guestpost = true;
-                guestusername = await this.ExtractString(posthtml, "guest username", this.Info.RegexGuestUsername, 1);
-                guesttitle = await this.ExtractString(posthtml, "guest title", this.Info.RegexGuestTitle, 1);
+                guestusername = await this.ExtractStringAsync(posthtml, "guest username", this.Info.RegexGuestUsername, 1);
+                guesttitle = await this.ExtractStringAsync(posthtml, "guest title", this.Info.RegexGuestTitle, 1);
             }
             else
             {
@@ -50,10 +48,14 @@ namespace PerryFlynn.ForumStatistics.Parser
                 }
                 else
                 {
-                    var searchResult = await this.SearchParser.SearchUser(username);
-                    if(searchResult.Count > 0)
+                    var searchResults = await this.SearchParser.SearchUserAsync(username);
+                    if(searchResults.Count > 0)
                     {
-                        searchResult.ForEach(async u => await this.Users.Import(u));
+                        foreach(var searchResult in searchResults)
+                        {
+                            await this.Users.ImportAsync(searchResult);
+                        }
+
                         user = this.Users.Get(username);
                     }
                 }
@@ -66,29 +68,29 @@ namespace PerryFlynn.ForumStatistics.Parser
 
             var post = new ThreadPost()
             {
-                Uid = (await this.ExtractUnsignedInt(posthtml, "post uid", this.Info.RegexUid, 1)).Value,
-                Url = await this.ExtractString(posthtml, "post url", this.Info.RegexPostUrl, 1),
+                Uid = (await this.ExtractUnsignedIntAsync(posthtml, "post uid", this.Info.RegexUid, 1)).Value,
+                Url = await this.ExtractStringAsync(posthtml, "post url", this.Info.RegexPostUrl, 1),
                 UserUid = useruid,
                 UserUrl = userurl,
                 User = user,
                 IsGuestPost = guestpost,
                 GuestUsername = guestusername,
                 GuestTitle = guesttitle,
-                Date = (await this.ExtractDateTime(posthtml, "post date", this.Info.RegexDate, 1, this.Info.DateFormat)).Value,
-                MessageHtml = await this.ExtractMessageHtml(posthtml),
-                LikeCount = (await this.ExtractUnsignedInt(posthtml, "post like count", this.Info.RegexLikeCount, 1, true, 0)).Value,
-                DislikeCount = (await this.ExtractUnsignedInt(posthtml, "post dislike count", this.Info.RegexDislikeCount, 1, true, 0)).Value
+                Date = (await this.ExtractDateTimeAsync(posthtml, "post date", this.Info.RegexDate, 1, this.Info.DateFormat)).Value,
+                MessageHtml = await this.ExtractMessageHtmlAsync(posthtml),
+                LikeCount = (await this.ExtractUnsignedIntAsync(posthtml, "post like count", this.Info.RegexLikeCount, 1, true, 0)).Value,
+                DislikeCount = (await this.ExtractUnsignedIntAsync(posthtml, "post dislike count", this.Info.RegexDislikeCount, 1, true, 0)).Value
             };
 
             if (user != null && string.IsNullOrEmpty(user.SignatureHtml))
             {
-                user.SignatureHtml = await this.ExtractSignatureHtml(posthtml);
+                user.SignatureHtml = await this.ExtractSignatureHtmlAsync(posthtml);
             }
 
             return post;
         }
 
-        public virtual async Task<string> ExtractMessageHtml(string posthtml)
+        public virtual async Task<string> ExtractMessageHtmlAsync(string posthtml)
         {
             return await Task.Run(() =>
             {
@@ -100,7 +102,7 @@ namespace PerryFlynn.ForumStatistics.Parser
             });
         }
 
-        public virtual async Task<string> ExtractSignatureHtml(string posthtml)
+        public virtual async Task<string> ExtractSignatureHtmlAsync(string posthtml)
         {
             return await Task.Run(() =>
             {

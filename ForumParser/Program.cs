@@ -5,6 +5,7 @@ using PerrysNetConsoleHtml;
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ForumParser
 {
@@ -46,8 +47,13 @@ namespace ForumParser
         {
             var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
 
-            var thread = parser.ParseThread(new Uri(url)).Result;
-            thread.Serialize(new FileInfo(path));
+            var task = Task.Run(async () =>
+            {
+                var thread = await parser.ParseThread(new Uri(url));
+                thread.Serialize(new FileInfo(path));
+            });
+
+            Task.WaitAll(task);
         }
 
         private static ForumThread Load(string jsonfile)

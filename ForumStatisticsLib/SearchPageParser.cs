@@ -17,7 +17,13 @@ namespace PerryFlynn.ForumStatistics.Parser
         public SearchPageParser(IUserSearchInfo info) : base()
         {
             this.Info = info;
-            this.FormToken = this.GetFormTokenAsync().Result;
+
+            var task = Task.Run(async () =>
+            {
+                this.FormToken = await this.GetFormTokenAsync();
+            });
+
+            Task.WaitAll(task);
         }
 
         public async Task<string> GetFormTokenAsync()

@@ -53,7 +53,7 @@ namespace PerryFlynn.ForumStatistics.Parser
                     var searchResult = await this.SearchParser.SearchUser(username);
                     if(searchResult.Count > 0)
                     {
-                        searchResult.ForEach(u => this.Users.Import(u));
+                        searchResult.ForEach(async u => await this.Users.Import(u));
                         user = this.Users.Get(username);
                     }
                 }

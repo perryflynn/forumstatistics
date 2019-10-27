@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
 
 namespace PerryFlynn.ForumStatistics.Parser
 {
@@ -38,11 +39,11 @@ namespace PerryFlynn.ForumStatistics.Parser
             return this.Users.Any(v => v.Uri == uri);
         }
 
-        public bool Import(Uri url)
+        public async Task<bool> Import(Uri url)
         {
             if (!this.Contains(url))
             {
-                var user = this.UserParser.ParseUserPage(url).Result;
+                var user = await this.UserParser.ParseUserPage(url);
                 if (!this.Contains(user.Uid))
                 {
                     this.Users.Add(user);
@@ -52,9 +53,9 @@ namespace PerryFlynn.ForumStatistics.Parser
             return false;
         }
 
-        public bool Import(string userSiteHtml)
+        public async Task<bool> Import(string userSiteHtml)
         {
-            var user = this.UserParser.ParseUserPage(userSiteHtml).Result;
+            var user = await this.UserParser.ParseUserPage(userSiteHtml);
             if(!this.Contains(user.Username))
             {
                 this.Users.Add(user);
@@ -68,18 +69,18 @@ namespace PerryFlynn.ForumStatistics.Parser
             return this.Users.Single(u => u.Username==username);
         }
 
-        public ForumUser GetOrImport(Uri url)
+        public async Task<ForumUser> GetOrImport(Uri url)
         {
             if (!this.Contains(url))
             {
-                this.Import(url);
+                await this.Import(url);
             }
             return this.Users.Single(v => v.Url == url.ToString());
         }
 
-        public ForumUser GetOrImport(string userSiteHtml)
+        public async Task<ForumUser> GetOrImport(string userSiteHtml)
         {
-            var user = this.UserParser.ParseUserPage(userSiteHtml).Result;
+            var user = await this.UserParser.ParseUserPage(userSiteHtml);
             if(!this.Contains(user.Username))
             {
                 this.Users.Add(user);

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using Xunit;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ParserTest
 {
@@ -27,15 +28,15 @@ namespace ParserTest
         [InlineData("https://forum.netcup.de/user/1320-perryflynn/", "perryflynn", 1320, "2008-12-27", "Enlightened", false)]
         [InlineData("https://forum.netcup.de/user/3-netcup-felix/", "[netcup] Felix", 3, "2008-02-29", "Geschäftsführer", false)]
         [InlineData("https://forum.netcup.de/user/4-admin/", "admin", 4, "2008-02-29", null, true)]
-        public void TestParseUser(string teststr, string username, uint uid, string regdate, string title, bool zero)
+        public async Task TestParseUser(string teststr, string username, uint uid, string regdate, string title, bool zero)
         {
             var usersearch = new SearchPageParser(new NetcupSearchInfo());
             var parser = new UserParser(new NetcupUserInfo());
 
             var users = new ForumUserCollection(parser);
-            foreach(var newUser in usersearch.SearchUser(username).Result)
+            foreach(var newUser in await usersearch.SearchUser(username))
             {
-                users.Import(newUser);
+                await users.Import(newUser);
             }
 
             var user = users.Get(username);
@@ -54,10 +55,10 @@ namespace ParserTest
         /// <param name="url">Page with guest post</param>
         [Theory]
         [InlineData("https://forum.netcup.de/sonstiges/smalltalk/p13789-das-l%C3%A4ngste-thema/")]
-        public void TestGuestUserPost(string url)
+        public async Task TestGuestUserPost(string url)
         {
             var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
-            var thread = parser.ParseThread(new Uri(url), 30, 30).Result;
+            var thread = await parser.ParseThread(new Uri(url), 30, 30);
 
             Assert.Contains(thread.Posts, v => v.IsGuestPost && string.IsNullOrEmpty(v.GuestUsername) == false);
         }
@@ -68,10 +69,10 @@ namespace ParserTest
         /// <param name="teststr">Thread url</param>
         [Theory]
         [InlineData("https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/?pageNo=760")]
-        public void TestParseThread(string teststr)
+        public async Task TestParseThread(string teststr)
         {
             var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
-            var thread = parser.ParseThread(new Uri(teststr), 1, 3).Result;
+            var thread = await parser.ParseThread(new Uri(teststr), 1, 3);
 
             var postUsers = thread.Posts.Where(v => v.User != null).Select(v => v.User).Distinct();
             var userIntersects = thread.Users.Users.Intersect(postUsers);
@@ -98,10 +99,10 @@ namespace ParserTest
         [InlineData("https://forum.netcup.de/sonstiges/smalltalk/p102253-das-l%C3%A4ngste-thema/#post102253", 767, 102253, true, true, true)]
         [InlineData("https://forum.netcup.de/sonstiges/smalltalk/p102260-das-l%C3%A4ngste-thema/#post102260", 767, 102260, false, false, true)]
         [InlineData("https://forum.netcup.de/sonstiges/smalltalk/p13789-das-l%C3%A4ngste-thema/#post13789", 30, 13789, false, false, false)]
-        public void TestPostParser(string url, uint page, uint postuid, bool haslikes, bool hassiganture, bool hasuser)
+        public async Task TestPostParser(string url, uint page, uint postuid, bool haslikes, bool hassiganture, bool hasuser)
         {
             var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
-            var thread = parser.ParseThread(new Uri(url.Substring(0, url.IndexOf('#'))), page, page).Result;
+            var thread = await parser.ParseThread(new Uri(url.Substring(0, url.IndexOf('#'))), page, page);
 
             var post = thread.Posts.Where(v => v.Uid == postuid).Single();
 

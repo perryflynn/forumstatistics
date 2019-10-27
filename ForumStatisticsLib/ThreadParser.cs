@@ -90,24 +90,21 @@ namespace PerryFlynn.ForumStatistics.Parser
 
         public virtual async Task<List<ThreadPost>> ExtractPosts(string threadpagehtml, ForumUserCollection users)
         {
-            return await Task.Run(() =>
+            var searchparser = new SearchPageParser(this.SearchInfo);
+            var postparser = new PostParser(this.PostInfo, searchparser, users);
+            var result = new List<ThreadPost>();
+
+            var doc = new HtmlDocument();
+            doc.LoadHtml(threadpagehtml);
+
+            var posts = doc.DocumentNode.SelectNodes(this.ThreadInfo.XpathPosts);
+
+            foreach (var post in posts)
             {
-                var searchparser = new SearchPageParser(this.SearchInfo);
-                var postparser = new PostParser(this.PostInfo, searchparser, users);
-                var result = new List<ThreadPost>();
+                result.Add(await postparser.Parse(post.OuterHtml));
+            }
 
-                var doc = new HtmlDocument();
-                doc.LoadHtml(threadpagehtml);
-
-                var posts = doc.DocumentNode.SelectNodes(this.ThreadInfo.XpathPosts);
-
-                foreach (var post in posts)
-                {
-                    result.Add(postparser.Parse(post.OuterHtml).Result);
-                }
-
-                return result;
-            });
+            return result;
         }
 
         public override void Dispose()

@@ -33,6 +33,9 @@ namespace PerryFlynn.ForumStatistics.Parser
         [JsonProperty]
         public string SignatureHtml { get; set; }
 
+        [JsonProperty]
+        public bool IsBanned { get; set; }
+
         public Uri Uri { get { return new Uri(this.Url); } }
     }
 }

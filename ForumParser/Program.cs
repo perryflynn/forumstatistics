@@ -89,7 +89,9 @@ namespace ForumParser
 
                 //--> Default filters
                 var cleanposts = thread.Posts.Where(v => filteroptoutpost(v));
-                var cleanusers = thread.Users.Users.Where(v => filteroptoutuser(v));
+                var cleanusers = thread.Users.Users
+                    .Where(v => filteroptoutuser(v))
+                    .Intersect(cleanposts.Select(u => u.User).Distinct());
 
                 //--> Current status
                 var curstats = new string[][]
@@ -99,6 +101,7 @@ namespace ForumParser
                     new string[] { "Crawl date:", thread.CrawlTimestamp.ToString("yyyy-MM-dd HH:mm:ss") },
                     new string[] { "Post count:", cleanposts.Count().ToString("#,###") },
                     new string[] { "Users involved:", cleanusers.Count().ToString("#,###") },
+                    new string[] { "Banned users:", cleanusers.Where(u => u.IsBanned).Count().ToString("#,###") },
                     new string[] { "Opt-Out users:", thread.Users.Users.Where(v=>filteroptoutuser(v)==false).Count().ToString("#,##0") },
                     new string[] { "Total likes:", cleanposts.Sum(v=>v.LikeCount).ToString("#,##0") },
                     new string[] { "Total dislikes:", cleanposts.Sum(v=>v.DislikeCount).ToString("#,##0") },

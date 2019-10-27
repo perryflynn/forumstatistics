@@ -37,7 +37,8 @@ namespace PerryFlynn.ForumStatistics.Parser
                 Title = await this.ExtractString(usersitehtml, "user title", this.Info.RegexUserTitle, 1, true, null),
                 PostCount = await this.ExtractPostcount(usersitehtml),
                 MemberSince = date,
-                Url = await this.ExtractString(usersitehtml, "page url", this.Info.RegexUrl, 1)
+                Url = await this.ExtractString(usersitehtml, "page url", this.Info.RegexUrl, 1),
+                IsBanned = (await this.ExtractString(usersitehtml, "user is banned", this.Info.RegexIsBanned, 1, true, null)) != null
             };
         }
 

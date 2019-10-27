@@ -24,11 +24,13 @@ namespace ParserTest
         /// <param name="regdate">Expected register date</param>
         /// <param name="title">Expected user title</param>
         /// <param name="zero">Expect no posts for this user</param>
+        /// <param name="isBanned">Expect user to be banned</param>
         [Theory]
-        [InlineData("https://forum.netcup.de/user/1320-perryflynn/", "perryflynn", 1320, "2008-12-27", "Enlightened", false)]
-        [InlineData("https://forum.netcup.de/user/3-netcup-felix/", "[netcup] Felix", 3, "2008-02-29", "Geschäftsführer", false)]
-        [InlineData("https://forum.netcup.de/user/4-admin/", "admin", 4, "2008-02-29", null, true)]
-        public async Task TestParseUser(string teststr, string username, uint uid, string regdate, string title, bool zero)
+        [InlineData("https://forum.netcup.de/user/1320-perryflynn/", "perryflynn", 1320, "2008-12-27", "Enlightened", false, false)]
+        [InlineData("https://forum.netcup.de/user/3-netcup-felix/", "[netcup] Felix", 3, "2008-02-29", "Geschäftsführer", false, false)]
+        [InlineData("https://forum.netcup.de/user/4-admin/", "admin", 4, "2008-02-29", null, true, false)]
+        [InlineData("https://forum.netcup.de/user/5274-netcup-martin/", "[netcup] Martin", 5274, "2012-11-20", "Ehemaliger Mitarbeiter", false, true)]
+        public async Task TestParseUser(string teststr, string username, uint uid, string regdate, string title, bool zero, bool isBanned)
         {
             var usersearch = new SearchPageParser(new NetcupSearchInfo());
             var parser = new UserParser(new NetcupUserInfo());
@@ -47,6 +49,7 @@ namespace ParserTest
             Assert.Equal(DateTime.ParseExact(regdate, "yyyy-MM-dd", CultureInfo.InvariantCulture), user.MemberSince);
             Assert.Equal(title, user.Title);
             Assert.True(zero ? user.PostCount == 0 : user.PostCount > 0);
+            Assert.Equal(isBanned, user.IsBanned);
         }
 
         /// <summary>

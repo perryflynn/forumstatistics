@@ -13,6 +13,7 @@ namespace PerryFlynn.ForumStatistics.Parser
         string RegexRegistrationDateString { get; }
         string RegexPostCount { get; }
         string RegexUrl { get; }
+        string RegexIsBanned { get; }
         Func<string, DateTime> RegistrationDateParseFunc { get; }
     }
 }

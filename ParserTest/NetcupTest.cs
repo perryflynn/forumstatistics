@@ -26,9 +26,9 @@ namespace ParserTest
         /// <param name="isBanned">Expect user to be banned</param>
         [Theory]
         [InlineData("https://forum.netcup.de/user/1320-perryflynn/", "perryflynn", 1320, "2008-12-27", "Enlightened", false, false)]
-        [InlineData("https://forum.netcup.de/user/3-netcup-felix/", "[netcup] Felix", 3, "2008-02-29", "Geschäftsführer", false, false)]
+        [InlineData("https://forum.netcup.de/user/3-netcup-felix-p/", "[netcup] Felix P.", 3, "2008-02-29", "Geschäftsführung", false, false)]
         [InlineData("https://forum.netcup.de/user/4-admin/", "admin", 4, "2008-02-29", null, true, false)]
-        [InlineData("https://forum.netcup.de/user/1024-netcup-alex/", "[netcup] Alex", 1024, "2008-11-01", "Ehemaliger Mitarbeiter", false, true)]
+        [InlineData("https://forum.netcup.de/user/1024-netcup-alex-w/", "[netcup] Alex W.", 1024, "2008-11-01", "Ex-Mitarbeiter", false, true)]
         public async Task TestParseUser(string teststr, string username, uint uid, string regdate, string title, bool zero, bool isBanned)
         {
             var usersearch = new SearchPageParser(new NetcupSearchInfo());

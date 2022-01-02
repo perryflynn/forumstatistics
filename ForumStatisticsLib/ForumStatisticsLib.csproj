@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp6</TargetFramework>
     <RootNamespace>PerryFlynn.ForumStatistics.Parser</RootNamespace>
     <AssemblyName>ForumStatisticsParser</AssemblyName>
   </PropertyGroup>

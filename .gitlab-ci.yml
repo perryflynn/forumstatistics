@@ -14,7 +14,7 @@ variables:
 #
 
 .tpl:default:
-  image: reg.git.brickburg.de/bbcontainers/base-stretch:nightly
+  image: reg.git.brickburg.de/bbcontainers/hub/debian:latest
   only:
     - schedules
     - web
@@ -22,7 +22,7 @@ variables:
     - docker
 
 .tpl:dotnet:
-  image: reg.git.brickburg.de/bbcontainers/dotnetcore:nightly-sdk
+  image: reg.git.brickburg.de/bbcontainers/dotnetcore:dotnet6-sdk
   extends: .tpl:default
 
 .tpl:deploy:

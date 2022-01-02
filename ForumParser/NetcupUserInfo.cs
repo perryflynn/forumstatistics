@@ -31,7 +31,7 @@ namespace ForumParser
             {
                 var temp = rgx.Match(str);
                 var search = temp.Groups[0].Value;
-                var replace = temp.Groups.Where(v => int.TryParse(v.Value, out int foo)).Single().Value;
+                var replace = temp.Groups.Values.Where(v => int.TryParse(v.Value, out int foo)).Single().Value;
 
                 str = str.Replace(search, replace);
             }

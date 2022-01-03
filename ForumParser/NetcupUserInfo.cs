@@ -21,7 +21,7 @@ namespace ForumParser
         public string RegexUserTitle => "<span class=\"[^\"]*userTitleBadge[^\"]*\">([^<]+)</span>";
         public string RegexRegistrationDateString => "<li>Member since ([^<]+)</li>";
         public string RegexPostCount => "<dt><a href=\"[^\"]+\" title=\"Posts by [^\"]+\" class=\"jsTooltip\">Posts</a></dt>\\s*<dd>([0-9,]+)</dd>";
-        public string RegexUrl => "<h3><a href=\"([^\"]+)\" class=\"username userLink\"";
+        public string RegexUrl => "<a href=\"([^\"]+)\" class=\"(username\\s*)?userLink\"";
         public string RegexIsBanned => "The user “[^”]+” (has been banned).";
 
         public Func<string, DateTime> RegistrationDateParseFunc => (str) =>

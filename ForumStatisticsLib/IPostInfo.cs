@@ -5,11 +5,14 @@
     /// </summary>
     public interface IPostInfo
     {
+        string IsDeletedRegex { get; }
         string RegexUid { get; }
         string RegexPostUrl { get; }
         string RegexUserUrl { get; }
+        int[] RegexUserUrlGroups { get; }
         string RegexUserUid { get; }
         string RegexUsername { get; }
+        int[] RegexUsernameGroups { get; }
         string RegexDate { get; }
         string DateFormat { get; }
         string XpathMessageHtml { get; }

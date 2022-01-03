@@ -116,5 +116,19 @@ namespace ParserTest
             Assert.Equal<bool>(hassiganture, !string.IsNullOrEmpty(post.User?.SignatureHtml));
         }
 
+        [Theory]
+        [InlineData("https://forum.netcup.de/sonstiges/smalltalk/1051-das-l%C3%A4ngste-thema/", 1434, 8, "friend_of_root")]
+        public async Task TestDeletedPostOnThreadPage(string url, uint page, int postIndex, string username)
+        {
+            var parser = new ThreadParser(new NetcupThreadInfo(), new NetcupPostInfo(), new NetcupUserInfo(), new NetcupSearchInfo());
+            var thread = await parser.ParseThreadAsync(new Uri(url), page, page);
+
+            var post = thread.Posts[postIndex];
+
+            Assert.True(post.IsDeletedPost);
+            Assert.Equal(post.User.Username, username);
+            Assert.NotEmpty(post.UserUrl);
+        }
+
     }
 }

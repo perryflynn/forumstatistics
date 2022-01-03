@@ -82,6 +82,28 @@ namespace PerryFlynn.ForumStatistics.Parser
             });
         }
 
+        protected virtual async Task<string> ExtractStringAsync(string content, string propertyname, string regex, int[] groups, bool usedefaultvalue, string defaultvalue)
+        {
+            foreach(var group in groups)
+            {
+                try
+                {
+                    var result = await this.ExtractStringAsync(content, propertyname, regex, group);
+                    if (result != "") {
+                        return result;
+                    }
+                }
+                catch (NoMatchException) {}
+            }
+
+            if (usedefaultvalue)
+            {
+                return defaultvalue;
+            }
+
+            throw new NoMatchException(propertyname, regex);
+        }
+
         protected virtual async Task<string> ExtractStringAsync(string content, string propertyname, string regex, int group)
         {
             return await this.ExtractStringAsync(content, propertyname, regex, group, false, null);

@@ -23,6 +23,10 @@ namespace PerryFlynn.ForumStatistics.Parser
         public bool IsGuestPost { get; set; }
 
         [JsonProperty]
+        public bool IsDeletedPost { get; set; }
+
+
+        [JsonProperty]
         public string GuestUsername { get; set; }
 
         [JsonProperty]

@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace PerryFlynn.ForumStatistics.Parser
 {
@@ -24,9 +25,9 @@ namespace PerryFlynn.ForumStatistics.Parser
 
         public virtual async Task<ThreadPost> ParseAsync(string posthtml)
         {
-            var userurl = await this.ExtractStringAsync(posthtml, "post user url", this.Info.RegexUserUrl, 1, true, null);
-            var username = await this.ExtractStringAsync(posthtml, "post username", this.Info.RegexUsername, 1, true, null);
+            var userurl = await this.ExtractStringAsync(posthtml, "post user url", this.Info.RegexUserUrl, this.Info.RegexUserUrlGroups, true, null);
             var useruid = await this.ExtractUnsignedIntAsync(posthtml, "post user uid", this.Info.RegexUserUid, 1, true, null);
+            var username = await this.ExtractStringAsync(posthtml, "post username", this.Info.RegexUsername, this.Info.RegexUsernameGroups, true, null);
 
             bool guestpost = false;
             ForumUser user = null;
@@ -66,21 +67,29 @@ namespace PerryFlynn.ForumStatistics.Parser
                 throw new Exception("Could not extract user");
             }
 
+            var isDeletedRgx = new Regex(this.Info.IsDeletedRegex);
+            var isDeleted = isDeletedRgx.IsMatch(posthtml);
+
             var post = new ThreadPost()
             {
                 Uid = (await this.ExtractUnsignedIntAsync(posthtml, "post uid", this.Info.RegexUid, 1)).Value,
-                Url = await this.ExtractStringAsync(posthtml, "post url", this.Info.RegexPostUrl, 1),
+                Url = await this.ExtractStringAsync(posthtml, "post url", this.Info.RegexPostUrl, 1, true, null),
                 UserUid = useruid,
                 UserUrl = userurl,
                 User = user,
+                IsDeletedPost = isDeleted,
                 IsGuestPost = guestpost,
                 GuestUsername = guestusername,
                 GuestTitle = guesttitle,
-                Date = (await this.ExtractDateTimeAsync(posthtml, "post date", this.Info.RegexDate, 1, this.Info.DateFormat)).Value,
-                MessageHtml = await this.ExtractMessageHtmlAsync(posthtml),
-                LikeCount = (await this.ExtractUnsignedIntAsync(posthtml, "post like count", this.Info.RegexLikeCount, 1, true, 0)).Value,
-                DislikeCount = (await this.ExtractUnsignedIntAsync(posthtml, "post dislike count", this.Info.RegexDislikeCount, 1, true, 0)).Value
             };
+
+            if (!post.IsDeletedPost)
+            {
+                post.Date = (await this.ExtractDateTimeAsync(posthtml, "post date", this.Info.RegexDate, 1, this.Info.DateFormat)).Value;
+                post.MessageHtml = await this.ExtractMessageHtmlAsync(posthtml);
+                post.LikeCount = (await this.ExtractUnsignedIntAsync(posthtml, "post like count", this.Info.RegexLikeCount, 1, true, 0)).Value;
+                post.DislikeCount = (await this.ExtractUnsignedIntAsync(posthtml, "post dislike count", this.Info.RegexDislikeCount, 1, true, 0)).Value;
+            }
 
             if (user != null && string.IsNullOrEmpty(user.SignatureHtml))
             {

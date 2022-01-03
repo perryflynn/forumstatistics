@@ -99,19 +99,20 @@ namespace ForumParser
                     new string[] { "JSON file:", Path.GetFileName(path) },
                     new string[] { "JSON file size:", (new FileInfo(path)).Length.HumanBytes() },
                     new string[] { "Crawl date:", thread.CrawlTimestamp.ToString("yyyy-MM-dd HH:mm:ss") },
-                    new string[] { "Post count:", cleanposts.Count().ToString("#,###") },
+                    new string[] { "Post count:", cleanposts.Count(p => !p.IsDeletedPost).ToString("#,###") },
+                    new string[] { "Deleted posts count:", cleanposts.Count(p => p.IsDeletedPost).ToString("#,###") },
                     new string[] { "Users involved:", cleanusers.Count().ToString("#,###") },
                     new string[] { "Banned users:", cleanusers.Where(u => u.IsBanned).Count().ToString("#,###") },
                     new string[] { "Opt-Out users:", thread.Users.Users.Where(v=>filteroptoutuser(v)==false).Count().ToString("#,##0") },
-                    new string[] { "Total likes:", cleanposts.Sum(v=>v.LikeCount).ToString("#,##0") },
-                    new string[] { "Total dislikes:", cleanposts.Sum(v=>v.DislikeCount).ToString("#,##0") },
-                    new string[] { "Posts with likes:", cleanposts.Where(v=>v.LikeCount>0).Count().ToString("#,##0") },
+                    new string[] { "Total likes:", cleanposts.Sum(v => v.LikeCount).ToString("#,##0") },
+                    new string[] { "Total dislikes:", cleanposts.Sum(v => v.DislikeCount).ToString("#,##0") },
+                    new string[] { "Posts with likes:", cleanposts.Where(v => v.LikeCount>0).Count().ToString("#,##0") },
                     new string[] { "Posts with dislikes:", cleanposts.Where(v => v.DislikeCount > 0).Count().ToString("#,##0") },
-                    new string[] { "First post:", cleanposts.Min(v=>v.Date).ToString("yyyy-MM-dd HH:mm:ss") },
-                    new string[] { "Last post:", cleanposts.Max(v=>v.Date).ToString("yyyy-MM-dd HH:mm:ss") },
-                    new string[] { "Thread age:", (cleanposts.Max(v=>v.Date)-cleanposts.Min(v=>v.Date)).PrettyPrint() },
-                    new string[] { "First user:", cleanposts.Where(v=>v.User!=null).GroupBy(v=>v.User).OrderBy(v=>v.Min(j=>j.Date)).Select(v=>$"{v.Key.Username} ({v.Count()})").First() },
-                    new string[] { "Newest user:", cleanposts.Where(v=>v.User!=null).GroupBy(v=>v.User).OrderByDescending(v=>v.Min(j=>j.Date)).Select(v=>$"{v.Key.Username} ({v.Count()})").First() }
+                    new string[] { "First post:", cleanposts.Min(v => v.Date).ToString("yyyy-MM-dd HH:mm:ss") },
+                    new string[] { "Last post:", cleanposts.Max(v => v.Date).ToString("yyyy-MM-dd HH:mm:ss") },
+                    new string[] { "Thread age:", (cleanposts.Max(v => v.Date)-cleanposts.Min(v=>v.Date)).PrettyPrint() },
+                    new string[] { "First user:", cleanposts.Where(v => v.User!=null).GroupBy(v=>v.User).OrderBy(v=>v.Min(j=>j.Date)).Select(v=>$"{v.Key.Username} ({v.Count()})").First() },
+                    new string[] { "Newest user:", cleanposts.Where(v => v.User!=null).GroupBy(v=>v.User).OrderByDescending(v=>v.Min(j=>j.Date)).Select(v=>$"{v.Key.Username} ({v.Count()})").First() }
                 };
 
                 CoEx.WriteTitle("Current status");

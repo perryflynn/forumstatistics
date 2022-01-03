@@ -88,7 +88,7 @@ namespace ForumParser
                 }
 
                 //--> Default filters
-                var cleanposts = thread.Posts.Where(v => filteroptoutpost(v));
+                var cleanposts = thread.Posts.Where(v => filteroptoutpost(v) && !v.IsDeletedPost);
                 var cleanusers = thread.Users.Users
                     .Where(v => filteroptoutuser(v))
                     .Intersect(cleanposts.Select(u => u.User).Distinct());
